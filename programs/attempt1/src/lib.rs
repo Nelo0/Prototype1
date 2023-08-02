@@ -6,19 +6,16 @@ declare_id!("4yhK57aLadt8wc9rmqF4QWDhVHQnkCMwXP8V6H9netGZ");
 pub mod attempt1 {
     use super::*;
 
-    pub fn initialize(
-        ctx: Context<Initialize>
-    ) -> Result<()> {
+    pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
         let wallet = &mut ctx.accounts.wallet;
         wallet.initializer = ctx.accounts.initializer.key();
-
+        
+        msg!("Account created");
         Ok(())
     }
 
-    pub fn close_account(
-        _ctx: Context<CloseAccount>
-    ) -> Result<()> {
-        msg!("Closed account");
+    pub fn close_account(_ctx: Context<CloseAccount>) -> Result<()> {
+        msg!("Account closed");
         Ok(())
     }
 }
