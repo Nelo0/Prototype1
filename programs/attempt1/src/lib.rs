@@ -24,6 +24,9 @@ pub mod attempt1 {
 
         // TODO - implement send_lamports()
 
+        **ctx.accounts.sending_wallet.to_account_info().try_borrow_mut_lamports()? -= amount_lamports;
+        **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount_lamports;
+
         Ok(())
     }
 }
@@ -58,11 +61,17 @@ pub struct CloseAccount<'info> {
 
 #[derive(Accounts)]
 pub struct SendLamports<'info> {
-    #[account(mut)]
-    pub sender: Account<'info, Wallet>,
+    #[account(
+        mut,
+        seeds = [initializer.key().as_ref()],
+        bump
+    )]
+    pub sending_wallet: Account<'info, Wallet>,
     /// CHECK: no check
     #[account(mut)]
     pub receiver: AccountInfo<'info>,
+    #[account(mut)]
+    pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -76,4 +85,11 @@ impl Wallet {
         8           // anchor discriminator
         + 32        // initializer
     }
+}
+
+
+#[error_code]
+pub enum WalletError {
+    #[msg("Transaction fail")]
+    TransactionFail
 }

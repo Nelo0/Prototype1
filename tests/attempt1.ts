@@ -3,6 +3,7 @@ import { Program } from "@coral-xyz/anchor"
 import { Attempt1 } from "../target/types/attempt1"
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { expect } from "chai"
+import fs from "fs/promises";
 
 describe("attempt1", () => {
   // Configure the client to use the local cluster.
@@ -24,7 +25,9 @@ describe("attempt1", () => {
   });
 
   it("sendLamports", async () => {
-    const destinationAccount = Keypair.generate();
+    const seed = new Uint8Array([103,1,3,247,197,176,136,131,180,63,18,89,16,67,93,36,122,79,253,102,134,80,74,72,35,143,251,104,83,226,173,201])
+
+    const destinationAccount = Keypair.fromSecretKey(seed);//Keypair.generate()
 
     // Airdrop SOL to walletPDA
     await provider.connection.requestAirdrop(walletPDA, 2 * LAMPORTS_PER_SOL)
@@ -33,15 +36,15 @@ describe("attempt1", () => {
     const tx = await program.methods
       .sendLamports(new anchor.BN(LAMPORTS_PER_SOL))
       .accounts({
-        sender: walletPDA, 
+        sendingWallet: walletPDA, 
         receiver: destinationAccount.publicKey
       })
       .rpc()
 
     // Check SOL is received
     expect(
-      await provider.connection.getBalance(destinationAccount.publicKey)
-    ).to.equal(LAMPORTS_PER_SOL);
+      await provider.connection.getBalance(destinationAccount.publicKey))
+      .to.equal(LAMPORTS_PER_SOL);
   })
 
   it("closeAccount", async () => {
