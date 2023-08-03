@@ -1,13 +1,9 @@
 use anchor_lang::prelude::*;
-use anchor_spl::token::Transfer;
-//use solana_program::system_instruction::transfer;
 
 declare_id!("4yhK57aLadt8wc9rmqF4QWDhVHQnkCMwXP8V6H9netGZ");
 
 #[program]
 pub mod attempt1 {
-    use anchor_lang::solana_program::system_instruction;
-
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
@@ -23,23 +19,10 @@ pub mod attempt1 {
         Ok(())
     }
 
-    pub fn send_sol(ctx: Context<SendLamports>, amount: u64) -> Result<()> {
-        msg!("Sending {} Lamports to {}", amount, ctx.accounts.receiver.key());
+    pub fn send_lamports(ctx: Context<SendLamports>, amount_lamports: u64) -> Result<()> {
+        msg!("Sending {} Lamports to {}", amount_lamports, ctx.accounts.receiver.key());
 
-        let from_account = &ctx.accounts.sender;
-        let to_account = &ctx.accounts.receiver;
-
-        let transfer_instruction = system_instruction::transfer(from_account.key, to_account.key, amount);
-
-        anchor_lang::solana_program::program::invoke_signed(
-            &transfer_instruction,
-            &[
-                from_account.to_account_info(),
-                to_account.clone(),
-                ctx.accounts.system_program.to_account_info(),
-            ],
-            &[],
-        )?;
+        // TODO - implement send_lamports()
 
         Ok(())
     }
@@ -76,7 +59,8 @@ pub struct CloseAccount<'info> {
 #[derive(Accounts)]
 pub struct SendLamports<'info> {
     #[account(mut)]
-    pub sender: Signer<'info>,
+    pub sender: Account<'info, Wallet>,
+    /// CHECK: no check
     #[account(mut)]
     pub receiver: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
