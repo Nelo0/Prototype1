@@ -22,8 +22,6 @@ pub mod attempt1 {
     pub fn send_lamports(ctx: Context<SendLamports>, amount_lamports: u64) -> Result<()> {
         msg!("Sending {} Lamports to {}", amount_lamports, ctx.accounts.receiver.key());
 
-        // TODO - implement send_lamports()
-
         **ctx.accounts.sending_wallet.to_account_info().try_borrow_mut_lamports()? -= amount_lamports;
         **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount_lamports;
 
