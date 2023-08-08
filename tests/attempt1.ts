@@ -1,9 +1,8 @@
 import * as anchor from "@coral-xyz/anchor"
 import { Program } from "@coral-xyz/anchor"
 import { Attempt1 } from "../target/types/attempt1"
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js"
 import { expect } from "chai"
-import fs from 'fs/promises';
 
 describe("attempt1", () => {
   // Configure the client to use the local cluster.
