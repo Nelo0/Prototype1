@@ -3,7 +3,7 @@ use anchor_lang::prelude::*;
 declare_id!("4yhK57aLadt8wc9rmqF4QWDhVHQnkCMwXP8V6H9netGZ");
 
 #[program]
-pub mod attempt1 {
+pub mod troubleshoot_1 {
     use super::*;
 
     pub fn initialize(ctx: Context<Initialize>) -> Result<()> {
@@ -62,14 +62,16 @@ pub struct SendLamports<'info> {
     #[account(
         mut,
         seeds = [initializer.key().as_ref()],
-        bump
+        bump,
+        signer
     )]
     pub sending_wallet: Account<'info, Wallet>,
     /// CHECK: no check
     #[account(mut)]
     pub receiver: AccountInfo<'info>,
+    /// CHECK: no check
     #[account(mut)]
-    pub initializer: Signer<'info>,
+    pub initializer: AccountInfo<'info>,
     pub system_program: Program<'info, System>,
 }
 
@@ -83,11 +85,15 @@ impl Wallet {
         8           // anchor discriminator
         + 32        // initializer
     }
+
 }
 
 
 #[error_code]
 pub enum WalletError {
     #[msg("Transaction fail")]
-    TransactionFail
+    TransactionFail,
+
+    #[msg("Insufficent funds for the transaction; fail")]
+    InsufficientFundsForTransaction
 }

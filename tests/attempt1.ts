@@ -7,7 +7,7 @@ import fs from 'fs/promises';
 
 describe("attempt1", () => {
   // Configure the client to use the local cluster.
-  let provider = anchor.AnchorProvider.env()
+  let provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider)
 
   const program = anchor.workspace.Attempt1 as Program<Attempt1>
