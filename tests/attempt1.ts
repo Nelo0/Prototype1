@@ -32,6 +32,9 @@ describe("attempt1", () => {
 
   it("sendLamports", async () => {
     const destinationAccount = Keypair.generate()
+    expect(
+      await provider.connection.getBalance(destinationAccount.publicKey)
+    ).to.equal(0);
 
     // Send SOL to walletPDA
     const transaction = new Transaction().add(
