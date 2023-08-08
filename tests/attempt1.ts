@@ -34,7 +34,8 @@ describe("attempt1", () => {
       .sendLamports(new anchor.BN(LAMPORTS_PER_SOL))
       .accounts({
         sendingWallet: walletPDA, 
-        receiver: destinationAccount.publicKey
+        receiver: destinationAccount.publicKey,
+        initializer: provider.wallet.publicKey
       })
       .rpc()
 
