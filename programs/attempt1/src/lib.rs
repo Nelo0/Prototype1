@@ -68,8 +68,7 @@ pub struct SendLamports<'info> {
     #[account(
         mut,
         seeds = [b"wallet", initializer.key().as_ref()],
-        bump,
-        signer
+        bump
     )]
     pub sending_wallet: Account<'info, Wallet>,
     

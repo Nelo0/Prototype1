@@ -1,7 +1,13 @@
 import * as anchor from "@coral-xyz/anchor"
 import { Program } from "@coral-xyz/anchor"
 import { Attempt1 } from "../target/types/attempt1"
-import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js"
+import { 
+  Keypair, 
+  LAMPORTS_PER_SOL,
+  Transaction,
+  SystemProgram,
+  sendAndConfirmTransaction
+ } from "@solana/web3.js"
 import { expect } from "chai"
 import { utf8 } from "@coral-xyz/anchor/dist/cjs/utils/bytes"
 
@@ -27,8 +33,15 @@ describe("attempt1", () => {
   it("sendLamports", async () => {
     const destinationAccount = Keypair.generate()
 
-    // Airdrop SOL to walletPDA
-    await provider.connection.requestAirdrop(walletPDA, 2 * LAMPORTS_PER_SOL)
+    // Send SOL to walletPDA
+    const transaction = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: provider.wallet.publicKey,
+        toPubkey: walletPDA,
+        lamports: LAMPORTS_PER_SOL * 2,
+      }),
+    );
+    await provider.sendAndConfirm(transaction);
 
     // Call PDA to send SOL to destinationAccount
     const tx = await program.methods
