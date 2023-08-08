@@ -3,6 +3,7 @@ import { Program } from "@coral-xyz/anchor"
 import { Attempt1 } from "../target/types/attempt1"
 import { Keypair, LAMPORTS_PER_SOL } from "@solana/web3.js"
 import { expect } from "chai"
+import { utf8 } from "@coral-xyz/anchor/dist/cjs/utils/bytes"
 
 describe("attempt1", () => {
   // Configure the client to use the local cluster.
@@ -12,7 +13,7 @@ describe("attempt1", () => {
   const program = anchor.workspace.Attempt1 as Program<Attempt1>
 
   const [walletPDA] = anchor.web3.PublicKey.findProgramAddressSync(
-    [provider.wallet.publicKey.toBuffer()],
+    [utf8.encode("wallet"), provider.wallet.publicKey.toBuffer()],
     program.programId
   )
 
@@ -34,8 +35,7 @@ describe("attempt1", () => {
       .sendLamports(new anchor.BN(LAMPORTS_PER_SOL))
       .accounts({
         sendingWallet: walletPDA, 
-        receiver: destinationAccount.publicKey,
-        initializer: provider.wallet.publicKey
+        receiver: destinationAccount.publicKey
       })
       .rpc()
 

@@ -21,8 +21,13 @@ pub mod attempt1 {
 
     pub fn send_lamports(ctx: Context<SendLamports>, amount_lamports: u64) -> Result<()> {
         msg!("Sending {} Lamports to {}", amount_lamports, ctx.accounts.receiver.key());
+        let sender = ctx.accounts.sending_wallet.to_account_info();
+        
+        if **sender.try_borrow_lamports()? < amount_lamports {
+            return err!(WalletError::InsufficientFundsForTransaction);
+        }
 
-        **ctx.accounts.sending_wallet.to_account_info().try_borrow_mut_lamports()? -= amount_lamports;
+        **sender.try_borrow_mut_lamports()? -= amount_lamports;
         **ctx.accounts.receiver.try_borrow_mut_lamports()? += amount_lamports;
 
         Ok(())
@@ -33,12 +38,13 @@ pub mod attempt1 {
 pub struct Initialize<'info> {
     #[account(
         init,
-        seeds = [initializer.key().as_ref()],
+        seeds = [b"wallet", initializer.key().as_ref()],
         bump,
         payer = initializer,
         space = Wallet::get_space()
     )]
     pub wallet: Account<'info, Wallet>,
+
     #[account(mut)]
     pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>
@@ -48,7 +54,7 @@ pub struct Initialize<'info> {
 pub struct CloseAccount<'info> {
     #[account(
         mut,
-        seeds = [initializer.key().as_ref()],
+        seeds = [b"wallet", initializer.key().as_ref()],
         bump,
         close = initializer
     )]
@@ -61,17 +67,17 @@ pub struct CloseAccount<'info> {
 pub struct SendLamports<'info> {
     #[account(
         mut,
-        seeds = [initializer.key().as_ref()],
+        seeds = [b"wallet", initializer.key().as_ref()],
         bump,
         signer
     )]
     pub sending_wallet: Account<'info, Wallet>,
-    /// CHECK: no check
+    
+    /// CHECK: Receiver account does not need to be checked
     #[account(mut)]
     pub receiver: AccountInfo<'info>,
-    /// CHECK: no check
     #[account(mut)]
-    pub initializer: AccountInfo<'info>,
+    pub initializer: Signer<'info>,
     pub system_program: Program<'info, System>,
 }
 
